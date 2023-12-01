@@ -271,8 +271,7 @@ namespace std {
 
 
 template <std::size_t Index, detail::specialization_of<::pair> Pair>
-constexpr auto get(Pair&& pair) noexcept 
-    -> typename std::tuple_element<Index, typename std::decay<Pair>::type>::type
+constexpr auto get(Pair&& pair) noexcept  -> decltype(auto)
 {
     if constexpr ( Index == 0 ) return std::forward<Pair>(pair).first();
     if constexpr ( Index == 1 ) return std::forward<Pair>(pair).second();
