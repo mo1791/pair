@@ -2,7 +2,9 @@
 
 ## Purpose
 
-
+The pair class is very similar to std::pair, but if either of the
+template arguments are empty classes, then the "empty base-class
+optimization" is applied to compress the size of the pair.
 
 
 ```c++
