@@ -49,10 +49,10 @@ int main()
     };
 
 
-    [[maybe_unused]] auto const&& [p1, p2] = 
-                            pair<point, point>(std::piecewise_construct,
-                                                    std::forward_as_tuple(1.25f, 6.54f),
-                                                    std::forward_as_tuple(2.31f, 7.89f) );
+    [[maybe_unused]] auto const&& [p1, p2] = pair<point, point>(
+                                            std::piecewise_construct,
+                                            std::forward_as_tuple(1.25f, 6.54f),
+                                            std::forward_as_tuple(2.31f, 7.89f) );
    
 
     p1.repr();
