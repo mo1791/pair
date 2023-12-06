@@ -16,10 +16,7 @@ optimization" is applied to compress the size of the pair.
 
 int main()
 {
-
-
-
-
+    
     pair p(58,62);
 
     [[maybe_unused]] auto& [a, b] = p;
