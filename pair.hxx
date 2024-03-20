@@ -87,8 +87,8 @@ public:
                                   std::is_nothrow_constructible<U, F>>::value )
         requires(std::conjunction<std::is_constructible<T, E>,
                                   std::is_constructible<U, F>>::value)
-        : m_first(std::forward<E>(first))
-        , m_second(std::forward<F>(second))
+        : m_first(std::forward_like<E>(first))
+        , m_second(std::forward_like<F>(second))
     {
     }
 
@@ -181,20 +181,14 @@ public:
 
 public:
     // access first element of a pair
-    constexpr auto first() const&  noexcept -> const first_type&  { return m_first; }
-    constexpr auto first()    &    noexcept ->       first_type&  { return m_first; }
-
-    constexpr auto first() const&& noexcept -> const first_type&& { return std::move(m_first); }
-    constexpr auto first()   &&    noexcept ->       first_type&& { return std::move(m_first); }
+    template <typename Self>
+    constexpr auto first(this Self&& self) noexcept { return std::forward_like<Self>(self).m_first; }
 
 
     // access second element of a pair
-    constexpr auto second() const&  noexcept -> const second_type& { return m_second; }
-    constexpr auto second()   &     noexcept ->       second_type& { return m_second; }
-    
-    constexpr auto second() const&& noexcept -> const second_type&& { return std::move(m_second); }
-    constexpr auto second()   &&    noexcept ->       second_type&& { return std::move(m_second); }
-
+    template <typename Self>
+    constexpr auto second(this Self&& self) noexcept { return std::forward_like<Self>(self).m_second; }
+ 
 
 private:
     [[no_unique_address]] first_type  m_first;
@@ -273,8 +267,8 @@ namespace std {
 template <std::size_t Index, detail::specialization_of<::pair> Pair>
 constexpr auto get(Pair&& pair) noexcept  -> decltype(auto)
 {
-    if constexpr ( Index == 0 ) return std::forward<Pair>(pair).first();
-    if constexpr ( Index == 1 ) return std::forward<Pair>(pair).second();
+    if constexpr ( Index == 0 ) return std::forward_like<Pair>(pair).first();
+    if constexpr ( Index == 1 ) return std::forward_like<Pair>(pair).second();
 }
 
 /****** END *******/
