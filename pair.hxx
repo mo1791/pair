@@ -159,8 +159,8 @@ public:
         requires(std::conjunction<std::is_copy_assignable<T>,
                                   std::is_copy_assignable<U>>::value)
     {
-        m_first  = rhs.first();
-        m_second = rhs.second();
+        this->m_first  = rhs.first();
+        this->m_second = rhs.second();
 
         return *this;
     }
@@ -172,8 +172,8 @@ public:
         requires(std::conjunction<std::is_move_assignable<T>,
                                   std::is_move_assignable<U>>::value)
     {
-        m_first  = std::move( rhs.first() );
-        m_second = std::move( rhs.second() );
+        this->m_first  = std::move( rhs.first() );
+        this->m_second = std::move( rhs.second() );
 
         return *this;
     }                     
@@ -181,14 +181,19 @@ public:
 
 public:
     // access first element of a pair
-    template <typename Self>
-    constexpr auto first(this Self&& self) noexcept { return std::forward_like<Self>(self).m_first; }
+    constexpr auto first() const& -> const first_type& { return this->m_first; }
+    constexpr auto first()      & ->       first_type& { return this->m_first; }
+
+    constexpr auto first() const&& -> const first_type&& { return std::move(this->m_first); }
+    constexpr auto first()      && ->       first_type&& { return std::move(this->m_first); }
 
 
     // access second element of a pair
-    template <typename Self>
-    constexpr auto second(this Self&& self) noexcept { return std::forward_like<Self>(self).m_second; }
- 
+    constexpr auto second() const& -> const second_type& { return this->m_second; }
+    constexpr auto second()      & ->       second_type& { return this->m_second; }
+
+    constexpr auto second() const&& -> const second_type&& { return std::move(this->m_second); }
+    constexpr auto second()      && ->       second_type&& { return std::move(this->m_second); }
 
 private:
     [[no_unique_address]] first_type  m_first;
@@ -264,11 +269,36 @@ namespace std {
 }
 
 
-template <std::size_t Index, detail::specialization_of<::pair> Pair>
-constexpr auto get(Pair&& pair) noexcept  -> decltype(auto)
+template <std::size_t Index, typename T1, typename T2>
+constexpr auto get(pair<T1, T2>& my_pair) ->
+    typename std::tuple_element<Index, compressed_pair<T1, T2>>::type&
 {
-    if constexpr ( Index == 0 ) return std::forward_like<Pair>(pair).first();
-    if constexpr ( Index == 1 ) return std::forward_like<Pair>(pair).second();
+    if constexpr (Index == 0) return my_pair.first();
+    if constexpr (Index == 1) return my_pair.second();
+}
+
+template <std::size_t Index, typename T1, typename T2>
+constexpr auto get(const pair<T1, T2>& my_pair) ->
+    typename std::tuple_element<Index, compressed_pair<T1, T2>>::type const&
+{
+    if constexpr (Index == 0) return my_pair.first();
+    if constexpr (Index == 1) return my_pair.second();
+}
+
+template <std::size_t Index, typename T1, typename T2>
+constexpr auto get(pair<T1, T2>&& my_pair) ->
+    typename std::tuple_element<Index, compressed_pair<T1, T2>>::type&&
+{
+    if constexpr (Index == 0) return std::move(my_pair.first());
+    if constexpr (Index == 1) return std::move(my_pair.second());
+}
+
+template <std::size_t Index, typename T1, typename T2>
+constexpr auto get(const pair<T1, T2>&& my_pair) ->
+    typename std::tuple_element<Index, compressed_pair<T1, T2>>::type const&&
+{
+    if constexpr (Index == 0) return std::move(my_pair.first());
+    if constexpr (Index == 1) return std::move(my_pair.second());
 }
 
 /****** END *******/
